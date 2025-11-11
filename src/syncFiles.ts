@@ -31,7 +31,7 @@ export async function syncFiles(options: SyncFilesOptions): Promise<void> {
 			user,
 			pass,
 			personalAccessToken,
-			cachePath: cachePath || "build",
+			cachePath: cachePath || "docs-cache",
 			prefix: prefix || "This document is automatically generated. Please don't edit it directly!",
 			insecure: insecure || false,
 			force: force || false,
