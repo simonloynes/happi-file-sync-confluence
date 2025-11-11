@@ -1,0 +1,32 @@
+name: "Happi File Sync Confluence"
+description: "Syncs specified files to target confluence pages"
+inputs:
+  file-mappings:
+    description: |
+      JSON object containing Confluence configuration and page mappings.
+      Format: {
+        "baseUrl": "string",
+        "user": "string (optional)",
+        "pass": "string (optional)",
+        "personalAccessToken": "string (optional)",
+        "cachePath": "string (default: docs-cache)",
+        "prefix": "string (optional)",
+        "insecure": "boolean (default: false)",
+        "force": "boolean (default: false)",
+        "fileRoot": "string (optional)",
+        "pages": [
+          {
+            "pageId": "string",
+            "file": "string",
+            "title": "string (optional)"
+          }
+        ]
+      }
+    required: true
+  debug:
+    description: "Enable debug logging"
+    required: false
+    default: "false"
+runs:
+  using: "node20"
+  main: "dist/index.js"
