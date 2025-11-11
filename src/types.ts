@@ -1,12 +1,31 @@
-import { Octokit } from "@octokit/rest";
 import { z } from "zod";
 
 export const FileMappingsSchema = z.object({
+	baseUrl: z.string(),
+	user: z.string().optional(),
+	pass: z.string().optional(),
+	personalAccessToken: z.string().optional(),
+	cachePath: z.string().default("build"),
+	prefix: z.string().optional(),
+	insecure: z.boolean().default(false),
+	force: z.boolean().default(false),
+	fileRoot: z.string().optional(),
+	pages: z.array(
+		z.object({
+			pageId: z.string(),
+			file: z.string(),
+			title: z.string().optional()
+		})
+	)
 });
 
 export interface SyncFilesOptions {
 	fileMap: FileMappingType;
-	octokit: Octokit;
+	page: {
+		pageId: string;
+		file: string;
+		title?: string;
+	};
 }
 
 export type FileMappingType = z.infer<typeof FileMappingsSchema>;

@@ -18,11 +18,12 @@
 	"author": "Simon Loynes",
 	"dependencies": {
 		"@actions/core": "^1.11.1",
-		"@octokit/rest": "^22.0.0",
+		"@octokit/rest": "^22.0.1",
+		"cosmere": "^0.17.2",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
-		"@types/node": "^24.9.2",
+		"@types/node": "^24.10.0",
 		"@vercel/ncc": "^0.38.4",
 		"prettier": "^3.6.2",
 		"semantic-release": "^25.0.1",
