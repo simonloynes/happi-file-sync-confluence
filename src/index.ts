@@ -20,3 +20,9 @@ export async function run(): Promise<void> {
 
 	logger.info("All pages synced successfully");
 }
+// Execute the run function when the action is run
+if (process.env.GITHUB_ACTIONS === 'true') {
+  run().catch((error) => {
+    core.setFailed(error instanceof Error ? error.message : String(error));
+  });
+}
