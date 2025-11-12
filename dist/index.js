@@ -57435,6 +57435,12 @@ async function run() {
     }));
     logger.info("All pages synced successfully");
 }
+// Execute the run function when the action is run
+if (process.env.GITHUB_ACTIONS === 'true') {
+    run().catch((error) => {
+        lib_core.setFailed(error instanceof Error ? error.message : String(error));
+    });
+}
 
 var __webpack_exports__run = __webpack_exports__.e;
 export { __webpack_exports__run as run };
