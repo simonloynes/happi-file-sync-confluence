@@ -48,8 +48,8 @@ export async function syncFiles(options: SyncFilesOptions): Promise<void> {
 		logger.info(`Syncing ${page.file} to Confluence page ${page.pageId}`);
 
 		// Sync with Confluence using cosmere
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const cosmereLib = require("cosmere/dist/src/lib") as (config: any) => Promise<void>;
+		// @ts-ignore - cosmere doesn't have type definitions
+		const { default: cosmereLib } = await import("cosmere/dist/src/lib");
 		await cosmereLib(cosmereConfig);
 
 		logger.info(`Successfully synced ${page.file} to Confluence page ${page.pageId}`);
