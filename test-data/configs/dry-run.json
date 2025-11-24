@@ -1,0 +1,19 @@
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"user": "your-email@company.com",
+	"pass": "your-api-token",
+	"personalAccessToken": "",
+	"cachePath": "build",
+	"insecure": false,
+	"force": false,
+	"fileRoot": "./test-data",
+	"pages": [
+		{
+			"pageId": "safe-test-page-id",
+			"file": "sample.md",
+			"title": "Safe Dry Run Test Page",
+			"spaceKey": "SANDBOX",
+			"parentId": ""
+		}
+	]
+}

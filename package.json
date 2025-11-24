@@ -13,14 +13,19 @@
 		"test": "node --test --experimental-test-coverage --test-coverage-exclude='**/*.test.ts' --import tsx/esm src/**/*.test.ts",
 		"test:watch": "node --test --watch --import tsx/esm src/**/*.test.ts",
 		"format": "prettier --write .",
-		"format:check": "prettier --check ."
+		"format:check": "prettier --check .",
+		"dev": "tsx src/local-runner.ts --help",
+		"dev:dry-run": "tsx src/local-runner.ts --dry-run",
+		"dev:validate": "tsx src/local-runner.ts --validate-only",
+		"dev:update": "tsx src/local-runner.ts --config test-data/configs/update-test.json",
+		"dev:create": "tsx src/local-runner.ts --config test-data/configs/create-test.json",
+		"dev:safe": "tsx src/local-runner.ts --config test-data/configs/dry-run.json --dry-run"
 	},
 	"keywords": [],
 	"author": "Simon Loynes",
 	"dependencies": {
 		"@actions/core": "^1.11.1",
 		"@octokit/rest": "^22.0.1",
-		"cosmere": "^0.17.2",
 		"zod": "^4.1.12"
 	},
 	"devDependencies": {
