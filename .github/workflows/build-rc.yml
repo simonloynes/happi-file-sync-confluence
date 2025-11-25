@@ -13,14 +13,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
       - name: Install dependencies
         run: pnpm install
 
