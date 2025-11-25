@@ -5,6 +5,9 @@ on:
     branches:
       - "release/v*-rc.*"
 
+permissions:
+  contents: write
+
 jobs:
   build-rc:
     runs-on: ubuntu-latest
