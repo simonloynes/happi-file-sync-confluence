@@ -5,7 +5,6 @@ export const FileMappingsSchema = z.object({
 	user: z.string().optional(),
 	pass: z.string().optional(),
 	personalAccessToken: z.string().optional(),
-	cachePath: z.string().default("build"),
 	prefix: z.string().optional(),
 	insecure: z.boolean().default(false),
 	force: z.boolean().default(false),

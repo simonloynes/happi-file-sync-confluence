@@ -9,7 +9,6 @@ inputs:
         "user": "string (optional)",
         "pass": "string (optional)",
         "personalAccessToken": "string (optional)",
-        "cachePath": "string (default: docs-cache)",
         "prefix": "string (optional)",
         "insecure": "boolean (default: false)",
         "force": "boolean (default: false)",

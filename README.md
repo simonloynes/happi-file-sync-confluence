@@ -1,196 +1,335 @@
 # Happi File Sync Confluence
 
-A tool to sync files from GitHub repositories to Confluence pages using the Cosmere library.
+A GitHub Action that syncs files from your repository to Confluence pages automatically.
+
+[![GitHub Release](https://img.shields.io/github/v/release/simonloynes/happi-file-sync-confluence)](https://github.com/simonloynes/happi-file-sync-confluence/releases)
+[![Test](https://github.com/simonloynes/happi-file-sync-confluence/actions/workflows/test-rc.yml/badge.svg)](https://github.com/simonloynes/happi-file-sync-confluence/actions/workflows/test-rc.yml)
 
 ## Features
 
-- Sync markdown files from GitHub to Confluence
-- Configurable file mappings
-- Integration with GitHub API via Octokit
-- Built on top of the Cosmere library for Confluence synchronization
+- 🚀 **GitHub Action Integration**: Runs automatically on repository events
+- 📝 **Multi-format Support**: Sync Markdown, HTML, and text files
+- 🔄 **Automatic Updates**: Updates existing pages or creates new ones
+- 🎯 **Flexible Configuration**: JSON-based configuration with validation
+- 🔐 **Secure Authentication**: Supports Personal Access Tokens and Basic Auth
+- 🧪 **Testing Support**: Dry-run mode and local testing capabilities
+- 🛡️ **Error Handling**: Comprehensive validation and error reporting
 
-## Installation
+## Quick Start
 
-```bash
-npm install
-# or
-pnpm install
+### 1. Basic Usage in GitHub Actions
+
+```yaml
+name: Sync Documentation
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", "README.md"]
+
+jobs:
+  sync-confluence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: simonloynes/happi-file-sync-confluence@v1
+        with:
+          file-mappings: |
+            {
+              "baseUrl": "https://your-company.atlassian.net/wiki",
+              "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+              "pages": [
+                {
+                  "pageId": "123456789",
+                  "file": "README.md",
+                  "title": "Project Documentation"
+                }
+              ]
+            }
 ```
 
-## Usage
+### 2. Set up Confluence Token
 
-The tool uses TypeScript and requires configuration of file mappings to specify which GitHub files should sync to which Confluence pages.
+1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Create a new API token
+3. Add it to your repository secrets as `CONFLUENCE_TOKEN`
+
+## Action Inputs
+
+| Input           | Description                           | Required | Default |
+| --------------- | ------------------------------------- | -------- | ------- |
+| `file-mappings` | JSON configuration object (see below) | ✅       | -       |
+| `debug`         | Enable debug logging                  | ❌       | `false` |
 
 ## Configuration
 
-File mappings are defined using the `FileMappingsSchema` which includes:
+The `file-mappings` input accepts a JSON object with the following structure:
 
-- **baseUrl**: Confluence base URL (including `/rest/api`)
-- **user/pass**: Username/password authentication (optional)
-- **personalAccessToken**: Personal access token authentication (optional)
-- **cachePath**: Build cache directory (default: "build")
-- **prefix**: Optional prefix text for generated pages
-- **pages**: Array of page mappings with:
-  - `pageId`: Confluence page ID
-  - `file`: GitHub file path
-  - `title`: Optional page title
+### Basic Configuration
+
+```json
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"personalAccessToken": "your-api-token",
+	"pages": [
+		{
+			"pageId": "123456789",
+			"file": "README.md",
+			"title": "Project Documentation"
+		}
+	]
+}
+```
+
+### Full Configuration Options
+
+```json
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"personalAccessToken": "your-token",
+	"prefix": "This document is automatically generated from GitHub",
+	"force": false,
+	"insecure": false,
+	"fileRoot": "docs",
+	"pages": [
+		{
+			"pageId": "123456789",
+			"file": "README.md",
+			"title": "Project Documentation"
+		},
+		{
+			"pageId": "new-page",
+			"file": "guides/setup.md",
+			"title": "Setup Guide",
+			"spaceKey": "DEV",
+			"parentId": "987654321"
+		}
+	]
+}
+```
+
+### Configuration Fields
+
+#### Global Settings
+
+- **`baseUrl`** (required): Your Confluence base URL including `/wiki`
+- **`personalAccessToken`** (required): Confluence API token
+- **`user`** / **`pass`**: Alternative basic authentication (not recommended)
+- **`prefix`**: Text to prepend to all synchronized pages
+- **`force`**: Force update even if content hasn't changed
+- **`insecure`**: Allow insecure HTTPS connections
+- **`fileRoot`**: Base directory for file paths (default: repository root)
+
+#### Page Configuration
+
+- **`pageId`** (required): Confluence page ID (number) or unique identifier for new pages
+- **`file`** (required): Path to file in repository (relative to `fileRoot`)
+- **`title`**: Page title (defaults to filename)
+- **`spaceKey`**: Space key (required for creating new pages)
+- **`parentId`**: Parent page ID (optional, for creating new pages)
+
+## Advanced Usage
+
+### Multiple File Types
+
+```yaml
+- uses: simonloynes/happi-file-sync-confluence@v1
+  with:
+    file-mappings: |
+      {
+        "baseUrl": "https://company.atlassian.net/wiki",
+        "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+        "fileRoot": "docs",
+        "pages": [
+          {
+            "pageId": "123456789",
+            "file": "api/readme.md",
+            "title": "API Documentation"
+          },
+          {
+            "pageId": "987654321", 
+            "file": "changelog.html",
+            "title": "Release Notes"
+          },
+          {
+            "pageId": "555666777",
+            "file": "deployment-guide.txt",
+            "title": "Deployment Guide"
+          }
+        ]
+      }
+```
+
+### Creating New Pages
+
+```yaml
+file-mappings: |
+  {
+    "baseUrl": "https://company.atlassian.net/wiki",
+    "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+    "pages": [
+      {
+        "pageId": "new-api-docs",
+        "file": "docs/api.md",
+        "title": "API Documentation",
+        "spaceKey": "DEV",
+        "parentId": "123456789"
+      }
+    ]
+  }
+```
+
+### Conditional Sync
+
+```yaml
+name: Sync Documentation
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**"]
+
+jobs:
+  sync:
+    if: contains(github.event.head_commit.message, '[sync-docs]')
+    runs-on: ubuntu-latest
+    steps:
+      # ... sync steps
+```
 
 ## Local Development & Testing
 
-### Quick Start
+### Prerequisites
 
-1. **Setup environment**:
+```bash
+# Install dependencies
+pnpm install
+# or
+npm install
+```
+
+### Setup Environment
+
+1. **Copy environment template**:
 
    ```bash
-   # Copy environment template
    cp .env.example .env
-
-   # Edit .env with your Confluence credentials
-   nano .env
    ```
 
-2. **Run safe test first**:
-
+2. **Configure your credentials** in `.env`:
    ```bash
-   # Dry run - shows what would be synced without making changes
-   npm run dev:safe
+   INPUT_FILE_MAPPINGS='{"baseUrl":"https://company.atlassian.net/wiki","personalAccessToken":"your-token","pages":[...]}'
+   INPUT_DEBUG=true
    ```
 
-3. **Test with your configuration**:
-   ```bash
-   # Edit test-data/configs/update-test.json with your page IDs
-   npm run dev:update -- --dry-run
-   ```
+### Testing Commands
 
-### Available Commands
+| Command                | Description                          |
+| ---------------------- | ------------------------------------ |
+| `npm run dev`          | Show help and available options      |
+| `npm run dev:safe`     | Safe dry-run with test configuration |
+| `npm run dev:dry-run`  | Dry-run mode (no changes made)       |
+| `npm run dev:validate` | Validate credentials and page access |
+| `npm run dev:update`   | Test updating existing pages         |
+| `npm run dev:create`   | Test creating new pages              |
 
-| Command                | Description                                 |
-| ---------------------- | ------------------------------------------- |
-| `npm run dev`          | Show help and available options             |
-| `npm run dev:dry-run`  | Run sync in dry-run mode (safe, no changes) |
-| `npm run dev:validate` | Validate credentials and page accessibility |
-| `npm run dev:update`   | Test updating existing pages                |
-| `npm run dev:create`   | Test creating new pages                     |
-| `npm run dev:safe`     | Safe dry-run with sandbox configuration     |
-
-### Configuration Options
-
-**Method 1: Environment Variables (.env file)**
+### Safe Testing
 
 ```bash
-INPUT_FILE_MAPPINGS='{"baseUrl":"https://company.atlassian.net/wiki",...}'
-INPUT_DEBUG=true
-```
+# Always start with dry-run mode
+npm run dev:safe
 
-**Method 2: Configuration Files**
-
-```bash
-# Use a JSON config file
-tsx src/local-runner.ts --config test-data/configs/update-test.json
-```
-
-**Method 3: Command Line**
-
-```bash
-# Combine config file with options
+# Test with your configuration
 npm run dev:update -- --dry-run --validate-only
 ```
 
-### Authentication Options
+## Release Process
 
-1. **Personal Access Token (Recommended)**:
+This project uses a comprehensive release process with Release Candidates for safe testing:
 
-   ```json
-   {
-   	"baseUrl": "https://company.atlassian.net/wiki",
-   	"personalAccessToken": "your-pat-token"
-   }
-   ```
+### Creating a Release Candidate
 
-2. **Username/Password**:
-   ```json
-   {
-   	"baseUrl": "https://company.atlassian.net/wiki",
-   	"user": "your-email@company.com",
-   	"pass": "your-api-token"
-   }
-   ```
+```bash
+# Create RC for testing
+./create-rc.sh v1.0.4
 
-### Test Files Structure
-
-```
-test-data/
-├── sample.md          # Sample markdown file
-├── sample.html        # Sample HTML file
-├── sample.txt         # Sample plain text
-└── configs/
-    ├── update-test.json   # Test updating existing pages
-    ├── create-test.json   # Test creating new pages
-    └── dry-run.json       # Safe testing configuration
+# This creates v1.0.4-rc.1 which gets built and tagged automatically
 ```
 
-### Page Configuration
+### Testing Release Candidates
 
-**Update existing page**:
-
-```json
-{
-	"pageId": "123456789",
-	"file": "sample.md",
-	"title": "Updated Page Title"
-}
+```yaml
+# Test the RC in your workflow
+- uses: simonloynes/happi-file-sync-confluence@v1.0.4-rc.1
+  with:
+    # ... your configuration
 ```
 
-**Create new page**:
+### Promoting to Stable Release
 
-```json
-{
-	"pageId": "new-page-id",
-	"file": "sample.md",
-	"title": "New Page Title",
-	"spaceKey": "DEV",
-	"parentId": "parent-page-id"
-}
+```bash
+# After testing passes
+./release.sh --promote-rc v1.0.4-rc.1
+
+# Or create a fresh release
+./release.sh v1.0.4
 ```
 
-### Safety Features
+## Troubleshooting
 
-- **🔍 Dry-run mode**: Preview changes without making them
-- **✅ Validation mode**: Check credentials and page access only
-- **📝 Verbose logging**: See exactly what will be modified
-- **🔐 Credential protection**: .env files are git-ignored
-- **🚫 Safe defaults**: Dry-run enabled by default
+### Common Issues
 
-### Troubleshooting
+**"Configuration not provided"**
 
-**Common Issues:**
+- Ensure `file-mappings` input is provided
+- Verify JSON format is valid
 
-1. **"Configuration not provided"**
-   - Ensure .env file exists or use --config flag
-   - Check INPUT_FILE_MAPPINGS format is valid JSON
+**"Page not found" / "Unauthorized"**
 
-2. **"Page not found"**
-   - Verify pageId is correct
-   - Check authentication credentials
-   - Use --validate-only to test connectivity
+- Check your Confluence token permissions
+- Verify page IDs exist and are accessible
+- Confirm base URL format: `https://company.atlassian.net/wiki`
 
-3. **"Cannot create new pages without space key"**
-   - Add "spaceKey" field to page configuration
-   - Ensure you have permissions to create pages in that space
+**"Cannot create pages without space key"**
 
-4. **Authentication errors**
-   - For Atlassian Cloud, use API tokens instead of passwords
-   - Verify base URL format: `https://company.atlassian.net/wiki`
+- Add `spaceKey` field for new pages
+- Ensure you have create permissions in the space
 
-### Development
+**File not found errors**
 
-This project is built with:
+- Check file paths are relative to repository root or `fileRoot`
+- Verify files exist in the repository
 
-- TypeScript
-- Node.js fetch API for Confluence REST API
-- Zod for schema validation
-- GitHub Actions core for CI/CD integration
+### Debug Mode
+
+Enable debug logging for detailed information:
+
+```yaml
+- uses: simonloynes/happi-file-sync-confluence@v1
+  with:
+    debug: "true"
+    file-mappings: |
+      # ... your config
+```
+
+### Getting Help
+
+1. Check the [GitHub Issues](https://github.com/simonloynes/happi-file-sync-confluence/issues)
+2. Review the [Action logs](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/using-workflow-run-logs) in your workflow
+3. Test locally using the development commands above
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Test your changes: `npm run test`
+4. Create a Release Candidate: `./create-rc.sh v1.x.x`
+5. Test the RC in a real workflow
+6. Submit a Pull Request
 
 ## License
 
-MIT
+MIT - See [LICENSE](LICENSE) file for details.
+
+---
+
+**Made with ❤️ for better documentation workflows**

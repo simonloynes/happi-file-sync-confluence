@@ -1,0 +1,85 @@
+name: Test Release Candidate
+
+on:
+  release:
+    types: [prereleased]
+  workflow_dispatch:
+    inputs:
+      rc_version:
+        description: "RC version to test (e.g., v1.0.4-rc.1)"
+        required: true
+        type: string
+
+jobs:
+  test-rc-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get RC version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ inputs.rc_version }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Test RC Action (Dry Run)
+        uses: simonloynes/happi-file-sync-confluence@${{ steps.get_version.outputs.version }}
+        with:
+          debug: "true"
+          file-mappings: |
+            {
+              "baseUrl": "https://httpbin.org",
+              "personalAccessToken": "test-token",
+              "prefix": "🧪 TEST DOCUMENT - This is a test of RC ${{ steps.get_version.outputs.version }}",
+              "force": false,
+              "insecure": false,
+              "fileRoot": ".",
+              "dryRun": true,
+              "pages": [
+                {
+                  "pageId": "test-page-id",
+                  "file": "README.md",
+                  "title": "RC Test - ${{ steps.get_version.outputs.version }}"
+                }
+              ]
+            }
+
+      - name: Validate Action Output
+        run: |
+          echo "✅ RC ${{ steps.get_version.outputs.version }} basic validation passed"
+          echo "🧪 This was a dry-run test to validate the action loads and runs"
+          echo "📝 For full testing, use the RC version in your real workflows"
+
+      - name: Post RC Test Results
+        if: github.event_name == 'release'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: '${{ steps.get_version.outputs.version }}'
+            });
+
+            const comment = `## 🧪 Automated RC Test Results
+
+            ✅ **Basic validation passed** for \`${{ steps.get_version.outputs.version }}\`
+
+            - Action loads successfully
+            - Configuration parsing works
+            - Dry-run mode executes without errors
+
+            **Next Steps:**
+            1. Test manually in your workflows using \`uses: simonloynes/happi-file-sync-confluence@${{ steps.get_version.outputs.version }}\`
+            2. If all tests pass, promote to stable: \`./release.sh --promote-rc ${{ steps.get_version.outputs.version }}\`
+            `;
+
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id,
+              body: release.body + '\n\n' + comment
+            });

@@ -1,33 +1,27 @@
-name: Sync to Confluence
+name: Sync Documentation
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["README.md"]
+    paths: ["docs/**", "README.md"]
 
 jobs:
-  sync:
+  sync-confluence:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: simonloynes/happi-file-sync-confluence@v1
         with:
-          debug: "true"
           file-mappings: |
             {
-              "baseUrl": "https://happi-corp.atlassian.net/rest/api",
+              "baseUrl": "https://happi-corp.atlassian.net/wiki",
               "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
-              "cachePath": "docs",
-              "prefix": "This document is automatically generated. Please don't edit it directly!",
-              "force": false,
-              "insecure": false,
-              "fileRoot": ".",
               "pages": [
                 {
-                  "pageId": "123456789",
+                  "pageId": "82542596",
                   "file": "README.md",
-                  "title": "Project Documentation - happi-file-sync-confluence"
+                  "title": "happi-file-sync-confluence Documentation"
                 }
               ]
             }

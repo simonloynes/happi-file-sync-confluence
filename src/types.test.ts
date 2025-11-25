@@ -7,7 +7,6 @@ describe("types and schemas", () => {
 		const validConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
 			personalAccessToken: "fake-token",
-			cachePath: "build",
 			prefix: "Auto-generated",
 			insecure: false,
 			force: false,
@@ -47,7 +46,6 @@ describe("types and schemas", () => {
 		const result = FileMappingsSchema.parse(minimalConfig);
 
 		assert.ok(result, "minimal config should parse successfully");
-		assert.equal(result.cachePath, "build", "should apply default cachePath");
 		assert.equal(result.insecure, false, "should apply default insecure");
 		assert.equal(result.force, false, "should apply default force");
 		assert.equal(result.pages[0].title, undefined, "optional title should remain undefined");

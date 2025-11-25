@@ -27,10 +27,97 @@ log_error() {
     exit 1
 }
 
-# Check if version argument is provided
-VERSION=$1
-if [ -z "$VERSION" ]; then
-    log_error "Usage: ./release.sh <version>\nExample: ./release.sh v1.0.4"
+# RC Promotion function
+promote_rc() {
+    local RC_TAG=$1
+    if [ -z "$RC_TAG" ]; then
+        log_error "Usage: ./release.sh --promote-rc <rc-version>\nExample: ./release.sh --promote-rc v1.0.4-rc.1"
+    fi
+    
+    # Validate RC tag format
+    if [[ ! $RC_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+        log_error "RC version must follow format: v1.2.3-rc.1"
+    fi
+    
+    # Extract final version from RC
+    local FINAL_VERSION=$(echo $RC_TAG | sed 's/-rc\.[0-9]*$//')
+    
+    log_info "Promoting RC $RC_TAG to final release $FINAL_VERSION"
+    
+    # Check if final version already exists
+    if git tag --list | grep -q "^$FINAL_VERSION$"; then
+        log_error "Final version $FINAL_VERSION already exists"
+    fi
+    
+    # Fetch all tags and branches
+    log_info "Fetching latest from remote..."
+    git fetch origin --tags
+    
+    # Check if RC tag exists
+    if ! git tag --list | grep -q "^$RC_TAG$"; then
+        log_error "RC tag $RC_TAG not found. Available RC tags:"
+        git tag --list | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+' || echo "No RC tags found"
+        exit 1
+    fi
+    
+    # Create a new branch from the RC tag for the final release
+    local RC_BRANCH="release/$RC_TAG"
+    local RELEASE_BRANCH="release-promotion-$FINAL_VERSION"
+    
+    log_info "Creating release branch from RC tag..."
+    git checkout $RC_TAG
+    git checkout -b $RELEASE_BRANCH
+    
+    # Update package.json to final version (remove RC suffix)
+    local PACKAGE_VERSION=${FINAL_VERSION#v}
+    log_info "Updating package.json to final version $PACKAGE_VERSION..."
+    
+    if command -v pnpm &> /dev/null; then
+        pnpm version $PACKAGE_VERSION --no-git-tag-version
+    else
+        npm version $PACKAGE_VERSION --no-git-tag-version
+    fi
+    
+    # Commit the version change
+    git add package.json
+    git commit -m "Promote RC $RC_TAG to release $FINAL_VERSION
+
+- Update package.json version to stable release
+- Promoted from tested release candidate"
+    
+    # Switch to main to continue with normal release process
+    git checkout main
+    git merge $RELEASE_BRANCH --no-ff -m "Merge promoted release $FINAL_VERSION from RC $RC_TAG"
+    
+    # Clean up temporary branch
+    git branch -d $RELEASE_BRANCH
+    
+    # Continue with the normal release process using the final version
+    log_info "Continuing with normal release process for $FINAL_VERSION..."
+    
+    # Set VERSION for the rest of the script to use
+    VERSION=$FINAL_VERSION
+}
+
+# Handle command line arguments
+if [ "$1" = "--promote-rc" ]; then
+    promote_rc $2
+    # VERSION is set by promote_rc function, continue with normal release flow
+elif [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "Usage:"
+    echo "  ./release.sh <version>              # Create new release"
+    echo "  ./release.sh --promote-rc <rc-tag>  # Promote RC to stable release"
+    echo ""
+    echo "Examples:"
+    echo "  ./release.sh v1.0.4"
+    echo "  ./release.sh --promote-rc v1.0.4-rc.1"
+    exit 0
+else
+    # Check if version argument is provided
+    VERSION=$1
+    if [ -z "$VERSION" ]; then
+        log_error "Usage: ./release.sh <version>\nExample: ./release.sh v1.0.4\n\nFor RC promotion: ./release.sh --promote-rc v1.0.4-rc.1"
+    fi
 fi
 
 # Validate version format (must start with 'v' and follow semver)

@@ -1,0 +1,60 @@
+name: Build Release Candidate
+
+on:
+  push:
+    branches:
+      - "release/v*-rc.*"
+
+jobs:
+  build-rc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build action
+        run: pnpm run build
+
+      - name: Commit built files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dist/
+          if [[ -n $(git status --porcelain) ]]; then
+            git commit -m "Build RC: Update dist files [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Create RC Tag
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          RC_VERSION=${BRANCH_NAME#release/}
+          echo "Creating RC tag: $RC_VERSION"
+          git tag $RC_VERSION
+          git push origin $RC_VERSION
+
+      - name: Create RC Release
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          RC_VERSION=${BRANCH_NAME#release/}
+          gh release create $RC_VERSION \
+            --prerelease \
+            --generate-notes \
+            --title "Release Candidate $RC_VERSION" \
+            --notes "🧪 Release Candidate - Test this version before promoting to stable release. Use in workflows with: uses: simonloynes/happi-file-sync-confluence@$RC_VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
