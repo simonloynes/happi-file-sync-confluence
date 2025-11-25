@@ -1,12 +1,18 @@
 import * as core from "@actions/core";
 import { SyncFilesOptions } from "./types";
 import { createLogger } from "./utils/logging";
+import {
+	ConfluenceApiClient,
+	convertToConfluenceStorage,
+	ConfluencePageCreate,
+	ConfluencePageUpdate
+} from "./confluence-api";
 
 export async function syncFiles(options: SyncFilesOptions): Promise<void> {
 	const { fileMap, page } = options;
-	const { baseUrl, user, pass, personalAccessToken, cachePath, prefix, insecure, force, fileRoot } = fileMap;
+	const { baseUrl, fileRoot } = fileMap;
 
-	const logger = createLogger(core.getInput("debug") === "true", "Cosmere");
+	const logger = createLogger(core.getInput("debug") === "true", "ConfluenceSync");
 
 	logger.info(`Starting sync for page ${page.pageId}: ${page.file} -> ${page.title || "untitled"}`);
 
@@ -25,34 +31,95 @@ export async function syncFiles(options: SyncFilesOptions): Promise<void> {
 			throw new Error(`File ${page.file} not found at ${filePath}`);
 		}
 
-		// Prepare cosmere configuration for this specific page
-		const cosmereConfig = {
-			baseUrl,
-			user,
-			pass,
-			personalAccessToken,
-			cachePath: cachePath || "docs-cache",
-			prefix: prefix || "This document is automatically generated. Please don't edit it directly!",
-			insecure: insecure || false,
-			force: force || false,
-			fileRoot: fileRoot || process.cwd(),
-			pages: [
-				{
-					pageId: page.pageId,
-					file: page.file,
-					title: page.title
+		// Read file content
+		const fileContent = await fs.readFile(filePath, "utf-8");
+		logger.info(`Successfully read file content (${fileContent.length} characters)`);
+
+		// Initialize Confluence API client
+		const confluenceClient = new ConfluenceApiClient(
+			{
+				baseUrl,
+				user: fileMap.user,
+				pass: fileMap.pass,
+				personalAccessToken: fileMap.personalAccessToken,
+				insecure: fileMap.insecure
+			},
+			core.getInput("debug") === "true"
+		);
+
+		// Determine content type based on file extension
+		const fileExtension = path.extname(page.file).toLowerCase();
+		let contentType: "markdown" | "html" | "plain" = "plain";
+		if (fileExtension === ".md" || fileExtension === ".markdown") {
+			contentType = "markdown";
+		} else if (fileExtension === ".html" || fileExtension === ".htm") {
+			contentType = "html";
+		}
+
+		// Convert file content to Confluence storage format
+		const confluenceContent = convertToConfluenceStorage(fileContent, contentType);
+		logger.info(`Converted content to Confluence storage format (${contentType} -> storage)`);
+
+		// Try to get existing page
+		const existingPage = await confluenceClient.getPage(page.pageId);
+
+		if (existingPage) {
+			// Update existing page
+			logger.info(`Found existing page "${existingPage.title}". Updating content...`);
+
+			const updateData: ConfluencePageUpdate = {
+				id: page.pageId,
+				type: "page",
+				title: page.title || existingPage.title,
+				body: {
+					storage: {
+						value: confluenceContent,
+						representation: "storage"
+					}
+				},
+				version: {
+					number: existingPage.version.number + 1
 				}
-			]
-		};
+			};
 
-		logger.info(`Syncing ${page.file} to Confluence page ${page.pageId}`);
+			const updatedPage = await confluenceClient.updatePage(updateData);
+			logger.info(`Successfully updated page "${updatedPage.title}" (ID: ${updatedPage.id})`);
+		} else {
+			// Page doesn't exist, try to create it if we have space configuration
+			if (!page.spaceKey) {
+				logger.error(`Page ${page.pageId} not found and cannot create new pages without a space key`);
+				logger.info(`To create new pages, add 'spaceKey' to your page configuration`);
+				throw new Error(`Page ${page.pageId} not found. Cannot create new pages without space key.`);
+			}
 
-		// Sync with Confluence using cosmere
-		// @ts-ignore - cosmere doesn't have type definitions
-		const { default: cosmereLib } = await import("cosmere/dist/src/lib");
-		await cosmereLib(cosmereConfig);
+			logger.info(`Page ${page.pageId} not found. Creating new page in space ${page.spaceKey}...`);
 
-		logger.info(`Successfully synced ${page.file} to Confluence page ${page.pageId}`);
+			const createData: ConfluencePageCreate = {
+				type: "page",
+				title: page.title || `Untitled Page ${page.pageId}`,
+				space: {
+					key: page.spaceKey
+				},
+				body: {
+					storage: {
+						value: confluenceContent,
+						representation: "storage"
+					}
+				}
+			};
+
+			// Add parent page if specified
+			if (page.parentId) {
+				createData.ancestors = [{ id: page.parentId }];
+				logger.info(`Creating page under parent ${page.parentId}`);
+			}
+
+			const createdPage = await confluenceClient.createPage(createData);
+			logger.info(`Successfully created new page "${createdPage.title}" (ID: ${createdPage.id})`);
+
+			// Update the pageId in outputs to reflect the actual created page ID
+			core.setOutput("page-id", createdPage.id);
+		}
 
 		// Set GitHub Actions outputs
 		core.setOutput("page-id", page.pageId);

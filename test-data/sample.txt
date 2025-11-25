@@ -1,0 +1,25 @@
+Sample Plain Text Document
+==========================
+
+This is a simple plain text document for testing plain text content sync to Confluence.
+
+Key Points:
+- No markdown formatting
+- No HTML tags  
+- Just plain text with line breaks
+- Should be converted to basic Confluence paragraphs
+
+This paragraph demonstrates how plain text is handled.
+Multiple lines within the same paragraph should be preserved with line breaks.
+
+This is a separate paragraph after a blank line.
+
+Testing scenarios:
+1. Plain text to Confluence storage format conversion
+2. Paragraph separation handling
+3. Line break preservation
+4. Special characters: & < > " '
+
+The sync process should wrap this content in appropriate Confluence storage format tags while preserving the basic structure and readability.
+
+End of sample plain text document.

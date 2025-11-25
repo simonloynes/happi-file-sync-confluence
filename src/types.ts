@@ -14,7 +14,9 @@ export const FileMappingsSchema = z.object({
 		z.object({
 			pageId: z.string(),
 			file: z.string(),
-			title: z.string().optional()
+			title: z.string().optional(),
+			spaceKey: z.string().optional(),
+			parentId: z.string().optional()
 		})
 	)
 });
@@ -25,6 +27,8 @@ export interface SyncFilesOptions {
 		pageId: string;
 		file: string;
 		title?: string;
+		spaceKey?: string;
+		parentId?: string;
 	};
 }
 

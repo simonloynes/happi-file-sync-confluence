@@ -1,0 +1,33 @@
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"user": "your-email@company.com",
+	"pass": "your-api-token",
+	"personalAccessToken": "",
+	"cachePath": "build",
+	"insecure": false,
+	"force": false,
+	"fileRoot": "./test-data",
+	"pages": [
+		{
+			"pageId": "new-markdown-page",
+			"file": "sample.md",
+			"title": "New Markdown Page from Local Test",
+			"spaceKey": "DEV",
+			"parentId": ""
+		},
+		{
+			"pageId": "new-html-page",
+			"file": "sample.html",
+			"title": "New HTML Page from Local Test",
+			"spaceKey": "DEV",
+			"parentId": ""
+		},
+		{
+			"pageId": "new-text-page",
+			"file": "sample.txt",
+			"title": "New Text Page from Local Test",
+			"spaceKey": "DEV",
+			"parentId": "123456789"
+		}
+	]
+}

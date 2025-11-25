@@ -1,0 +1,27 @@
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"user": "your-email@company.com",
+	"pass": "your-api-token",
+	"personalAccessToken": "",
+	"cachePath": "build",
+	"insecure": false,
+	"force": false,
+	"fileRoot": "./test-data",
+	"pages": [
+		{
+			"pageId": "123456789",
+			"file": "sample.md",
+			"title": "Updated Sample Markdown Page"
+		},
+		{
+			"pageId": "987654321",
+			"file": "sample.html",
+			"title": "Updated Sample HTML Page"
+		},
+		{
+			"pageId": "555666777",
+			"file": "sample.txt",
+			"title": "Updated Sample Text Page"
+		}
+	]
+}

@@ -6,3 +6,20 @@ todo.md
 dist/
 AGENTS.md
 .vscode
+
+# Local development environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Personal configuration files with credentials
+test-data/configs/my-config.json
+test-data/configs/personal-*.json
+
+# Local test outputs
+test-output/
+*.log
+
+*nosync*
