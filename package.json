@@ -10,7 +10,7 @@
 	},
 	"scripts": {
 		"build": "ncc build ./src/index.ts",
-		"test": "node --test --experimental-test-coverage --test-coverage-exclude '**/*.test.ts' --import tsx/esm src/**/*.test.ts",
+		"test": "node --test --experimental-test-coverage --import tsx/esm src/**/*.test.ts",
 		"test:watch": "node --test --watch --import tsx/esm src/**/*.test.ts",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
