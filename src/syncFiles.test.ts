@@ -30,7 +30,6 @@ describe("syncFiles", () => {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
 				personalAccessToken: "fake-token",
-				insecure: false,
 				force: false,
 				pages: []
 			},
@@ -53,7 +52,6 @@ describe("syncFiles", () => {
 		const options: SyncFilesOptions = {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
-				insecure: false,
 				force: false,
 				pages: []
 			},
@@ -65,7 +63,6 @@ describe("syncFiles", () => {
 
 		// Test required properties exist
 		assert.ok(options.fileMap.baseUrl, "baseUrl should be required");
-		assert.ok(typeof options.fileMap.insecure === "boolean", "insecure should be boolean");
 		assert.ok(typeof options.fileMap.force === "boolean", "force should be boolean");
 		assert.ok(Array.isArray(options.fileMap.pages), "pages should be array");
 	});
@@ -74,7 +71,6 @@ describe("syncFiles", () => {
 		const options: SyncFilesOptions = {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
-				insecure: false,
 				force: false,
 				pages: []
 			},
@@ -98,7 +94,6 @@ describe("syncFiles", () => {
 		const options: SyncFilesOptions = {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
-				insecure: false,
 				force: false,
 				pages: []
 			},
@@ -121,7 +116,6 @@ describe("syncFiles", () => {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
 				personalAccessToken: "fake-token",
-				insecure: false,
 				force: false,
 				pages: []
 			},
@@ -137,7 +131,6 @@ describe("syncFiles", () => {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
 				user: "testuser",
 				pass: "testpass",
-				insecure: false,
 				force: false,
 				pages: []
 			},

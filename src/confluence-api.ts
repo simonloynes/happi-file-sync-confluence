@@ -5,7 +5,6 @@ export interface ConfluenceConfig {
 	user?: string;
 	pass?: string;
 	personalAccessToken?: string;
-	insecure?: boolean;
 }
 
 export interface ConfluencePage {
@@ -155,13 +154,6 @@ export class ConfluenceApiClient {
 				...options.headers
 			}
 		};
-
-		// Handle insecure connections if needed
-		if (this.config.insecure) {
-			// Note: In Node.js, you'd need to handle this with process.env.NODE_TLS_REJECT_UNAUTHORIZED
-			// For GitHub Actions, this might not be necessary
-			this.logger.debug("Using insecure connection (ignoring SSL certificates)");
-		}
 
 		const response = await fetch(url, requestOptions);
 

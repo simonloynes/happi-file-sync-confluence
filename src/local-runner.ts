@@ -293,8 +293,7 @@ Examples:
 				baseUrl: fileMaps.baseUrl,
 				user: fileMaps.user,
 				pass: fileMaps.pass,
-				personalAccessToken: fileMaps.personalAccessToken,
-				insecure: fileMaps.insecure
+				personalAccessToken: fileMaps.personalAccessToken
 			},
 			true
 		);

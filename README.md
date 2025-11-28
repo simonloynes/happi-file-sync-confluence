@@ -94,7 +94,6 @@ The `file-mappings` input accepts a JSON object with the following structure:
 	"pass": "your-token",
 	"prefix": "This document is automatically generated from GitHub",
 	"force": false,
-	"insecure": false,
 	"fileRoot": "docs",
 	"pages": [
 		{
@@ -122,7 +121,6 @@ The `file-mappings` input accepts a JSON object with the following structure:
 - **`personalAccessToken`**: Personal Access Token authentication (legacy option)
 - **`prefix`**: Text to prepend to all synchronized pages
 - **`force`**: Force update even if content hasn't changed
-- **`insecure`**: Allow insecure HTTPS connections
 - **`fileRoot`**: Base directory for file paths (default: repository root)
 
 #### Page Configuration
