@@ -37,7 +37,8 @@ jobs:
           file-mappings: |
             {
               "baseUrl": "https://your-company.atlassian.net/wiki",
-              "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+              "user": "${{ secrets.CONFLUENCE_USER }}",
+              "pass": "${{ secrets.CONFLUENCE_PASS }}",
               "pages": [
                 {
                   "pageId": "123456789",
@@ -48,11 +49,13 @@ jobs:
             }
 ```
 
-### 2. Set up Confluence Token
+### 2. Set up Confluence Credentials
 
 1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
-2. Create a new API token
-3. Add it to your repository secrets as `CONFLUENCE_TOKEN`
+2. Create a new API token (this will be used as your password value)
+3. Add two repository secrets:
+   - `CONFLUENCE_USER` (email/username)
+   - `CONFLUENCE_PASS` (API token from step 2)
 
 ## Action Inputs
 
@@ -70,7 +73,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
 ```json
 {
 	"baseUrl": "https://your-company.atlassian.net/wiki",
-	"personalAccessToken": "your-api-token",
+	"user": "your.email@company.com",
+	"pass": "your-api-token",
 	"pages": [
 		{
 			"pageId": "123456789",
@@ -86,7 +90,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
 ```json
 {
 	"baseUrl": "https://your-company.atlassian.net/wiki",
-	"personalAccessToken": "your-token",
+	"user": "your.email@company.com",
+	"pass": "your-token",
 	"prefix": "This document is automatically generated from GitHub",
 	"force": false,
 	"insecure": false,
@@ -113,8 +118,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
 #### Global Settings
 
 - **`baseUrl`** (required): Your Confluence base URL including `/wiki`
-- **`personalAccessToken`** (required): Confluence API token
-- **`user`** / **`pass`**: Alternative basic authentication (not recommended)
+- **`user`** / **`pass`** (required): Email/username plus API token (Basic Auth)
+- **`personalAccessToken`**: Personal Access Token authentication (legacy option)
 - **`prefix`**: Text to prepend to all synchronized pages
 - **`force`**: Force update even if content hasn't changed
 - **`insecure`**: Allow insecure HTTPS connections
@@ -138,7 +143,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
     file-mappings: |
       {
         "baseUrl": "https://company.atlassian.net/wiki",
-        "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+        "user": "${{ secrets.CONFLUENCE_USER }}",
+        "pass": "${{ secrets.CONFLUENCE_PASS }}",
         "fileRoot": "docs",
         "pages": [
           {
@@ -147,7 +153,7 @@ The `file-mappings` input accepts a JSON object with the following structure:
             "title": "API Documentation"
           },
           {
-            "pageId": "987654321", 
+            "pageId": "987654321",
             "file": "changelog.html",
             "title": "Release Notes"
           },
@@ -166,7 +172,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
 file-mappings: |
   {
     "baseUrl": "https://company.atlassian.net/wiki",
-    "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+    "user": "${{ secrets.CONFLUENCE_USER }}",
+    "pass": "${{ secrets.CONFLUENCE_PASS }}",
     "pages": [
       {
         "pageId": "new-api-docs",
@@ -217,7 +224,7 @@ npm install
 
 2. **Configure your credentials** in `.env`:
    ```bash
-   INPUT_FILE_MAPPINGS='{"baseUrl":"https://company.atlassian.net/wiki","personalAccessToken":"your-token","pages":[...]}'
+   INPUT_FILE_MAPPINGS='{"baseUrl":"https://company.atlassian.net/wiki","user":"your.email@company.com","pass":"your-token","pages":[...]}'
    INPUT_DEBUG=true
    ```
 
