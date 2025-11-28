@@ -42,8 +42,7 @@ export async function syncFiles(options: SyncFilesOptions): Promise<void> {
 				baseUrl,
 				user: fileMap.user,
 				pass: fileMap.pass,
-				personalAccessToken: fileMap.personalAccessToken,
-				insecure: fileMap.insecure
+				personalAccessToken: fileMap.personalAccessToken
 			},
 			core.getInput("debug") === "true"
 		);

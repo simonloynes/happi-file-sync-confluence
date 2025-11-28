@@ -8,7 +8,6 @@ describe("types and schemas", () => {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
 			personalAccessToken: "fake-token",
 			prefix: "Auto-generated",
-			insecure: false,
 			force: false,
 			fileRoot: "/test",
 			pages: [
@@ -46,7 +45,6 @@ describe("types and schemas", () => {
 		const result = FileMappingsSchema.parse(minimalConfig);
 
 		assert.ok(result, "minimal config should parse successfully");
-		assert.equal(result.insecure, false, "should apply default insecure");
 		assert.equal(result.force, false, "should apply default force");
 		assert.equal(result.pages[0].title, undefined, "optional title should remain undefined");
 	});
@@ -126,7 +124,6 @@ describe("types and schemas", () => {
 		const booleanConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
 			personalAccessToken: "fake-token",
-			insecure: true,
 			force: true,
 			pages: []
 		};
@@ -134,7 +131,6 @@ describe("types and schemas", () => {
 		const result = FileMappingsSchema.parse(booleanConfig);
 
 		assert.ok(result, "boolean config should parse successfully");
-		assert.equal(result.insecure, true);
 		assert.equal(result.force, true);
 	});
 });

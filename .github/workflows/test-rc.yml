@@ -35,7 +35,6 @@ jobs:
               "personalAccessToken": "test-token",
               "prefix": "🧪 TEST DOCUMENT - This is a test of RC ${{ steps.get_version.outputs.version }}",
               "force": false,
-              "insecure": false,
               "fileRoot": ".",
               "dryRun": true,
               "pages": [
