@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: simonloynes/happi-file-sync-confluence@v1
+      - uses: simonloynes/happi-file-sync-confluence@v2
         with:
           file-mappings: |
             {
