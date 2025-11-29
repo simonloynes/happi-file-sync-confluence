@@ -10,7 +10,6 @@ inputs:
         "pass": "string (optional)",
         "personalAccessToken": "string (optional)",
         "prefix": "string (optional)",
-        "force": "boolean (default: false)",
         "fileRoot": "string (optional)",
          "pages": [
            {
@@ -22,6 +21,7 @@ inputs:
            }
          ]
       }
+      Note: Authentication requires either personalAccessToken OR both user and pass.
     required: true
   debug:
     description: "Enable debug logging"

@@ -56,57 +56,6 @@ export interface ConfluencePageUpdate {
 	};
 }
 
-/**
- * Convert content to Confluence storage format
- * This is a basic implementation that handles plain text and some basic markdown
- */
-export function convertToConfluenceStorage(
-	content: string,
-	contentType: "markdown" | "html" | "plain" = "plain"
-): string {
-	if (contentType === "html") {
-		// If content is already HTML, wrap it in basic Confluence storage format
-		return `<p>${content}</p>`;
-	}
-
-	if (contentType === "markdown") {
-		// Basic markdown to Confluence storage conversion
-		// This is a simplified implementation - for production use, consider using a proper markdown parser
-		let converted = content
-			// Headers
-			.replace(/^# (.*$)/gim, "<h1>$1</h1>")
-			.replace(/^## (.*$)/gim, "<h2>$1</h2>")
-			.replace(/^### (.*$)/gim, "<h3>$1</h3>")
-			// Bold and italic
-			.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-			.replace(/\*(.*?)\*/g, "<em>$1</em>")
-			// Code blocks
-			.replace(
-				/```([\s\S]*?)```/g,
-				'<ac:structured-macro ac:name="code"><ac:plain-text-body><![CDATA[$1]]></ac:plain-text-body></ac:structured-macro>'
-			)
-			.replace(/`(.*?)`/g, "<code>$1</code>")
-			// Links
-			.replace(/\[([^\]]*)\]\(([^)]*)\)/g, '<a href="$2">$1</a>')
-			// Line breaks
-			.replace(/\n\n/g, "</p><p>")
-			.replace(/\n/g, "<br/>");
-
-		return `<p>${converted}</p>`;
-	}
-
-	// Plain text - wrap in paragraphs and handle line breaks
-	const paragraphs = content
-		.split("\n\n")
-		.map((p) => p.trim())
-		.filter((p) => p.length > 0);
-	if (paragraphs.length === 0) {
-		return "<p></p>";
-	}
-
-	return paragraphs.map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`).join("");
-}
-
 export class ConfluenceApiClient {
 	private config: ConfluenceConfig;
 	private logger = createLogger(false, "ConfluenceAPI");

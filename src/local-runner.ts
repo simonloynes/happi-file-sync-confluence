@@ -334,7 +334,7 @@ Examples:
 	private async dryRunSync(options: any): Promise<void> {
 		const fs = await import("fs/promises");
 		const path = await import("path");
-		const { convertToConfluenceStorage } = await import("./confluence-api");
+		const { convertToConfluenceStorage } = await import("./utils/confluence-converter");
 
 		const { fileMap, page } = options;
 

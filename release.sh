@@ -27,6 +27,38 @@ log_error() {
     exit 1
 }
 
+# Helper function to update package.json version if needed
+update_package_version() {
+    local TARGET_VERSION=$1
+    local CURRENT_VERSION
+    
+    # Read current version from package.json
+    if [ ! -f "package.json" ]; then
+        log_error "package.json not found"
+    fi
+    
+    # Read version using grep (works regardless of module type)
+    CURRENT_VERSION=$(grep -oE '"version"\s*:\s*"[^"]*"' package.json | sed -E 's/.*"version"\s*:\s*"([^"]*)".*/\1/')
+    
+    if [ -z "$CURRENT_VERSION" ]; then
+        log_error "Could not read current version from package.json"
+    fi
+    
+    if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+        log_info "Package version is already $TARGET_VERSION, skipping update"
+        return 0
+    fi
+    
+    log_info "Updating package.json from $CURRENT_VERSION to $TARGET_VERSION..."
+    
+    # Use npm version for reliable version updates (works even with pnpm)
+    if command -v npm &> /dev/null; then
+        npm version $TARGET_VERSION --no-git-tag-version
+    else
+        log_error "npm is required for version updates"
+    fi
+}
+
 # RC Promotion function
 promote_rc() {
     local RC_TAG=$1
@@ -70,13 +102,7 @@ promote_rc() {
     
     # Update package.json to final version (remove RC suffix)
     local PACKAGE_VERSION=${FINAL_VERSION#v}
-    log_info "Updating package.json to final version $PACKAGE_VERSION..."
-    
-    if command -v pnpm &> /dev/null; then
-        pnpm version $PACKAGE_VERSION --no-git-tag-version
-    else
-        npm version $PACKAGE_VERSION --no-git-tag-version
-    fi
+    update_package_version $PACKAGE_VERSION
     
     # Commit the version change
     git add package.json
@@ -87,6 +113,16 @@ promote_rc() {
     
     # Switch to main to continue with normal release process
     git checkout main
+    
+    # Check if main has diverged from the RC tag
+    COMMITS_AHEAD=$(git rev-list --count $RC_TAG..main 2>/dev/null || echo "0")
+    if [ "$COMMITS_AHEAD" -gt 0 ]; then
+        log_warning "Main branch has $COMMITS_AHEAD commit(s) after the RC tag $RC_TAG"
+        log_warning "This may cause merge conflicts. The following commits are on main but not in the RC:"
+        git log --oneline $RC_TAG..main | sed 's/^/  - /'
+        log_warning "Proceeding with merge - conflicts may need manual resolution..."
+    fi
+    
     git merge $RELEASE_BRANCH --no-ff -m "Merge promoted release $FINAL_VERSION from RC $RC_TAG"
     
     # Clean up temporary branch
@@ -186,12 +222,7 @@ if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
 fi
 
 # Update package.json version (without creating git tag)
-log_info "Updating package.json to version ${VERSION#v}..."
-if [ "$PKG_MANAGER" = "pnpm" ]; then
-    pnpm version ${VERSION#v} --no-git-tag-version
-else
-    npm version ${VERSION#v} --no-git-tag-version
-fi
+update_package_version ${VERSION#v}
 
 # Stage and commit all changes
 log_info "Committing changes..."

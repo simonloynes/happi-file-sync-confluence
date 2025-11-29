@@ -23,3 +23,6 @@ test-output/
 *.log
 
 *nosync*
+
+AGENTS.md
+TODO.md

@@ -25,8 +25,15 @@ jobs:
             echo "version=${{ inputs.rc_version }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Checkout action at RC version
+        uses: actions/checkout@v4
+        with:
+          repository: simonloynes/happi-file-sync-confluence
+          ref: ${{ steps.get_version.outputs.version }}
+          path: ./.github/actions/test-action
+
       - name: Test RC Action (Dry Run)
-        uses: simonloynes/happi-file-sync-confluence@${{ steps.get_version.outputs.version }}
+        uses: ./.github/actions/test-action
         with:
           debug: "true"
           file-mappings: |
@@ -34,7 +41,6 @@ jobs:
               "baseUrl": "https://httpbin.org",
               "personalAccessToken": "test-token",
               "prefix": "🧪 TEST DOCUMENT - This is a test of RC ${{ steps.get_version.outputs.version }}",
-              "force": false,
               "fileRoot": ".",
               "dryRun": true,
               "pages": [
