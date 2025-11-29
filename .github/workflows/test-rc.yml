@@ -34,7 +34,6 @@ jobs:
               "baseUrl": "https://httpbin.org",
               "personalAccessToken": "test-token",
               "prefix": "🧪 TEST DOCUMENT - This is a test of RC ${{ steps.get_version.outputs.version }}",
-              "force": false,
               "fileRoot": ".",
               "dryRun": true,
               "pages": [

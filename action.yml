@@ -10,7 +10,6 @@ inputs:
         "pass": "string (optional)",
         "personalAccessToken": "string (optional)",
         "prefix": "string (optional)",
-        "force": "boolean (default: false)",
         "fileRoot": "string (optional)",
          "pages": [
            {
