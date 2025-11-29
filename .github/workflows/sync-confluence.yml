@@ -16,10 +16,11 @@ jobs:
           file-mappings: |
             {
               "baseUrl": "https://happi-corp.atlassian.net/wiki",
-              "personalAccessToken": "${{ secrets.CONFLUENCE_TOKEN }}",
+              "user": "${{ secrets.CONFLUENCE_USER }}",
+              "pass": "${{ secrets.CONFLUENCE_TOKEN }}",
               "pages": [
                 {
-                  "pageId": "82542596",
+                  "pageId": "84246530",
                   "file": "README.md",
                   "title": "happi-file-sync-confluence Documentation"
                 }
