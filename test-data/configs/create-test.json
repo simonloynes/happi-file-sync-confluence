@@ -3,7 +3,6 @@
 	"user": "your-email@company.com",
 	"pass": "your-api-token",
 	"personalAccessToken": "",
-	"force": false,
 	"fileRoot": "./test-data",
 	"pages": [
 		{

@@ -5,22 +5,21 @@ inputs:
     description: |
       JSON object containing Confluence configuration and page mappings.
       Format: {
-        "baseUrl": "string (required) - Confluence base URL including /wiki",
-        "user": "string (optional) - Email/username for Basic Auth (required if pass provided)",
-        "pass": "string (optional) - API token for Basic Auth (required if user provided)",
-        "personalAccessToken": "string (optional) - Personal Access Token (alternative to user/pass)",
-        "prefix": "string (optional) - Text to prepend to all synchronized pages",
-        "force": "boolean (optional, default: false) - Force update even if content hasn't changed",
-        "fileRoot": "string (optional, default: repository root) - Base directory for file paths",
-        "pages": [
-          {
-            "pageId": "string (required) - Confluence page ID (number) or unique identifier for new pages",
-            "file": "string (required) - Path to file in repository (relative to fileRoot)",
-            "title": "string (optional, default: filename) - Page title",
-            "spaceKey": "string (optional, required for creating new pages) - Space key",
-            "parentId": "string (optional) - Parent page ID for creating new pages"
-          }
-        ]
+        "baseUrl": "string",
+        "user": "string (optional)",
+        "pass": "string (optional)",
+        "personalAccessToken": "string (optional)",
+        "prefix": "string (optional)",
+        "fileRoot": "string (optional)",
+         "pages": [
+           {
+             "pageId": "string",
+             "file": "string",
+             "title": "string (optional)",
+             "spaceKey": "string (optional, required for creating new pages)",
+             "parentId": "string (optional, parent page ID for new pages)"
+           }
+         ]
       }
       Note: Authentication requires either personalAccessToken OR both user and pass.
     required: true

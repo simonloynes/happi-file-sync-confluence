@@ -6,7 +6,6 @@ export const FileMappingsSchema = z.object({
 	pass: z.string().optional(),
 	personalAccessToken: z.string().optional(),
 	prefix: z.string().optional(),
-	force: z.boolean().default(false),
 	fileRoot: z.string().optional(),
 	pages: z.array(
 		z.object({
