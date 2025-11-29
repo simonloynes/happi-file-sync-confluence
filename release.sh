@@ -87,6 +87,16 @@ promote_rc() {
     
     # Switch to main to continue with normal release process
     git checkout main
+    
+    # Check if main has diverged from the RC tag
+    COMMITS_AHEAD=$(git rev-list --count $RC_TAG..main 2>/dev/null || echo "0")
+    if [ "$COMMITS_AHEAD" -gt 0 ]; then
+        log_warning "Main branch has $COMMITS_AHEAD commit(s) after the RC tag $RC_TAG"
+        log_warning "This may cause merge conflicts. The following commits are on main but not in the RC:"
+        git log --oneline $RC_TAG..main | sed 's/^/  - /'
+        log_warning "Proceeding with merge - conflicts may need manual resolution..."
+    fi
+    
     git merge $RELEASE_BRANCH --no-ff -m "Merge promoted release $FINAL_VERSION from RC $RC_TAG"
     
     # Clean up temporary branch
