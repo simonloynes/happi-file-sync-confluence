@@ -1,4 +1,4 @@
-# Happi File Sync Confluence
+# Happi File Sync Confluence 😜
 
 A GitHub Action that syncs files from your repository to Confluence pages automatically.
 
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: simonloynes/happi-file-sync-confluence@v1
+      - uses: simonloynes/happi-file-sync-confluence@v2
         with:
           file-mappings: |
             {
@@ -51,11 +51,19 @@ jobs:
 
 ### 2. Set up Confluence Credentials
 
+You can authenticate using either method:
+
+**Option A: Basic Auth (user + API token)**
 1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Create a new API token (this will be used as your password value)
 3. Add two repository secrets:
    - `CONFLUENCE_USER` (email/username)
    - `CONFLUENCE_PASS` (API token from step 2)
+
+**Option B: Personal Access Token**
+1. Create a Personal Access Token in your Atlassian account
+2. Add a repository secret:
+   - `CONFLUENCE_TOKEN` (your personal access token)
 
 ## Action Inputs
 
@@ -75,6 +83,22 @@ The `file-mappings` input accepts a JSON object with the following structure:
 	"baseUrl": "https://your-company.atlassian.net/wiki",
 	"user": "your.email@company.com",
 	"pass": "your-api-token",
+	"pages": [
+		{
+			"pageId": "123456789",
+			"file": "README.md",
+			"title": "Project Documentation"
+		}
+	]
+}
+```
+
+**Or using Personal Access Token:**
+
+```json
+{
+	"baseUrl": "https://your-company.atlassian.net/wiki",
+	"personalAccessToken": "your-personal-access-token",
 	"pages": [
 		{
 			"pageId": "123456789",
@@ -116,8 +140,8 @@ The `file-mappings` input accepts a JSON object with the following structure:
 #### Global Settings
 
 - **`baseUrl`** (required): Your Confluence base URL including `/wiki`
-- **`user`** / **`pass`** (required): Email/username plus API token (Basic Auth)
-- **`personalAccessToken`**: Personal Access Token authentication (legacy option)
+- **`user`** / **`pass`** (optional): Email/username plus API token (Basic Auth). Required if `personalAccessToken` is not provided.
+- **`personalAccessToken`** (optional): Personal Access Token authentication. Required if `user` and `pass` are not provided.
 - **`prefix`**: Text to prepend to all synchronized pages
 - **`fileRoot`**: Base directory for file paths (default: repository root)
 
@@ -134,7 +158,7 @@ The `file-mappings` input accepts a JSON object with the following structure:
 ### Multiple File Types
 
 ```yaml
-- uses: simonloynes/happi-file-sync-confluence@v1
+- uses: simonloynes/happi-file-sync-confluence@v2
   with:
     file-mappings: |
       {
@@ -212,11 +236,7 @@ npm install
 
 ### Setup Environment
 
-1. **Copy environment template**:
-
-   ```bash
-   cp .env.example .env
-   ```
+1. **Create a `.env` file** in the project root (if it doesn't exist)
 
 2. **Configure your credentials** in `.env`:
    ```bash
@@ -262,7 +282,7 @@ This project uses a comprehensive release process with Release Candidates for sa
 
 ```yaml
 # Test the RC in your workflow
-- uses: simonloynes/happi-file-sync-confluence@v1.0.4-rc.1
+- uses: simonloynes/happi-file-sync-confluence@v2.0.4-rc.1
   with:
     # ... your configuration
 ```
@@ -307,7 +327,7 @@ This project uses a comprehensive release process with Release Candidates for sa
 Enable debug logging for detailed information:
 
 ```yaml
-- uses: simonloynes/happi-file-sync-confluence@v1
+- uses: simonloynes/happi-file-sync-confluence@v2
   with:
     debug: "true"
     file-mappings: |
@@ -328,10 +348,6 @@ Enable debug logging for detailed information:
 4. Create a Release Candidate: `./create-rc.sh v1.x.x`
 5. Test the RC in a real workflow
 6. Submit a Pull Request
-
-## License
-
-MIT - See [LICENSE](LICENSE) file for details.
 
 ---
 
