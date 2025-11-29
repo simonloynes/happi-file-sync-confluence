@@ -93,7 +93,6 @@ The `file-mappings` input accepts a JSON object with the following structure:
 	"user": "your.email@company.com",
 	"pass": "your-token",
 	"prefix": "This document is automatically generated from GitHub",
-	"force": false,
 	"fileRoot": "docs",
 	"pages": [
 		{
@@ -120,7 +119,6 @@ The `file-mappings` input accepts a JSON object with the following structure:
 - **`user`** / **`pass`** (required): Email/username plus API token (Basic Auth)
 - **`personalAccessToken`**: Personal Access Token authentication (legacy option)
 - **`prefix`**: Text to prepend to all synchronized pages
-- **`force`**: Force update even if content hasn't changed
 - **`fileRoot`**: Base directory for file paths (default: repository root)
 
 #### Page Configuration
