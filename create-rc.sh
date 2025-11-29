@@ -27,6 +27,38 @@ log_error() {
     exit 1
 }
 
+# Helper function to update package.json version if needed
+update_package_version() {
+    local TARGET_VERSION=$1
+    local CURRENT_VERSION
+    
+    # Read current version from package.json
+    if [ ! -f "package.json" ]; then
+        log_error "package.json not found"
+    fi
+    
+    # Read version using grep (works regardless of module type)
+    CURRENT_VERSION=$(grep -oE '"version"\s*:\s*"[^"]*"' package.json | sed -E 's/.*"version"\s*:\s*"([^"]*)".*/\1/')
+    
+    if [ -z "$CURRENT_VERSION" ]; then
+        log_error "Could not read current version from package.json"
+    fi
+    
+    if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+        log_info "Package version is already $TARGET_VERSION, skipping update"
+        return 0
+    fi
+    
+    log_info "Updating package.json from $CURRENT_VERSION to $TARGET_VERSION..."
+    
+    # Use npm version for reliable version updates (works even with pnpm)
+    if command -v npm &> /dev/null; then
+        npm version $TARGET_VERSION --no-git-tag-version
+    else
+        log_error "npm is required for version updates"
+    fi
+}
+
 # Check arguments
 VERSION=$1
 RC_NUM=${2:-1}
@@ -103,14 +135,8 @@ log_info "Creating RC branch from main..."
 git checkout -b $RC_BRANCH
 
 # Update package.json version to RC version
-log_info "Updating package.json to RC version ${RC_VERSION#v}..."
 PACKAGE_VERSION=${RC_VERSION#v}
-# Use npm version for reliable version updates (works even with pnpm)
-if command -v npm &> /dev/null; then
-    npm version $PACKAGE_VERSION --no-git-tag-version
-else
-    log_error "npm is required for version updates"
-fi
+update_package_version $PACKAGE_VERSION
 
 # Commit the version change
 git add package.json
