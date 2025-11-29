@@ -105,10 +105,11 @@ git checkout -b $RC_BRANCH
 # Update package.json version to RC version
 log_info "Updating package.json to RC version ${RC_VERSION#v}..."
 PACKAGE_VERSION=${RC_VERSION#v}
-if [ "$PKG_MANAGER" = "pnpm" ]; then
-    pnpm version $PACKAGE_VERSION --no-git-tag-version
-else
+# Use npm version for reliable version updates (works even with pnpm)
+if command -v npm &> /dev/null; then
     npm version $PACKAGE_VERSION --no-git-tag-version
+else
+    log_error "npm is required for version updates"
 fi
 
 # Commit the version change

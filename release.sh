@@ -72,10 +72,11 @@ promote_rc() {
     local PACKAGE_VERSION=${FINAL_VERSION#v}
     log_info "Updating package.json to final version $PACKAGE_VERSION..."
     
-    if command -v pnpm &> /dev/null; then
-        pnpm version $PACKAGE_VERSION --no-git-tag-version
-    else
+    # Use npm version for reliable version updates (works even with pnpm)
+    if command -v npm &> /dev/null; then
         npm version $PACKAGE_VERSION --no-git-tag-version
+    else
+        log_error "npm is required for version updates"
     fi
     
     # Commit the version change
@@ -197,10 +198,11 @@ fi
 
 # Update package.json version (without creating git tag)
 log_info "Updating package.json to version ${VERSION#v}..."
-if [ "$PKG_MANAGER" = "pnpm" ]; then
-    pnpm version ${VERSION#v} --no-git-tag-version
-else
+# Use npm version for reliable version updates (works even with pnpm)
+if command -v npm &> /dev/null; then
     npm version ${VERSION#v} --no-git-tag-version
+else
+    log_error "npm is required for version updates"
 fi
 
 # Stage and commit all changes
