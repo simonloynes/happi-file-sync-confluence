@@ -55,16 +55,7 @@ INPUT_FILE_MAPPINGS='{"baseUrl":"..."}' npx tsx src/local-runner.ts --validate-o
 
 ## Authentication Examples
 
-**Personal Access Token (Recommended):**
-
-```json
-{
-	"baseUrl": "https://company.atlassian.net/wiki",
-	"personalAccessToken": "ATATT3xFfGF0..."
-}
-```
-
-**Username/Password:**
+**Username/Password (Basic Auth):**
 
 ```json
 {

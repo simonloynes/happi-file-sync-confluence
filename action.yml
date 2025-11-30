@@ -6,9 +6,8 @@ inputs:
       JSON object containing Confluence configuration and page mappings.
       Format: {
         "baseUrl": "string",
-        "user": "string (optional)",
-        "pass": "string (optional)",
-        "personalAccessToken": "string (optional)",
+        "user": "string (required)",
+        "pass": "string (required)",
         "prefix": "string (optional)",
         "fileRoot": "string (optional)",
          "pages": [
@@ -21,7 +20,7 @@ inputs:
            }
          ]
       }
-      Note: Authentication requires either personalAccessToken OR both user and pass.
+      Note: Authentication requires both user and pass (Basic Auth with API token).
     required: true
   debug:
     description: "Enable debug logging"

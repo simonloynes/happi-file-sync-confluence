@@ -2,6 +2,8 @@
 
 A GitHub Action that syncs files from your repository to Confluence pages automatically.
 
+> **Note**: This script is designed to work with **Confluence Cloud**. It uses Basic Auth with API tokens, which is the supported authentication method for Atlassian Cloud services.
+
 [![GitHub Release](https://img.shields.io/github/v/release/simonloynes/happi-file-sync-confluence)](https://github.com/simonloynes/happi-file-sync-confluence/releases)
 [![Test](https://github.com/simonloynes/happi-file-sync-confluence/actions/workflows/test-rc.yml/badge.svg)](https://github.com/simonloynes/happi-file-sync-confluence/actions/workflows/test-rc.yml)
 
@@ -11,7 +13,7 @@ A GitHub Action that syncs files from your repository to Confluence pages automa
 - 📝 **Multi-format Support**: Sync Markdown, HTML, and text files
 - 🔄 **Automatic Updates**: Updates existing pages or creates new ones
 - 🎯 **Flexible Configuration**: JSON-based configuration with validation
-- 🔐 **Secure Authentication**: Supports Personal Access Tokens and Basic Auth
+- 🔐 **Secure Authentication**: Supports Basic Auth with API tokens
 - 🧪 **Testing Support**: Dry-run mode and local testing capabilities
 - 🛡️ **Error Handling**: Comprehensive validation and error reporting
 
@@ -28,30 +30,29 @@ All requests are made to: `{baseUrl}/rest/api{endpoint}`
 1. **GET `/content/{pageId}?expand=body.storage,version,space`**
    - Purpose: Fetch an existing page by ID to check if it exists and get its current content/version
    - Used when: Checking if a page exists before updating it
-   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Authentication: Basic Auth (user/pass)
 
 2. **POST `/content`**
    - Purpose: Create a new Confluence page
    - Used when: Creating a new page (when pageId doesn't exist)
-   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Authentication: Basic Auth (user/pass)
    - Request Body: JSON with page title, space, body content, and optional parent page
 
 3. **PUT `/content/{pageId}`**
    - Purpose: Update an existing Confluence page
    - Used when: Updating an existing page (when pageId exists)
-   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Authentication: Basic Auth (user/pass)
    - Request Body: JSON with page ID, title, body content, and version number
 
 4. **GET `/space/{spaceKey}`**
    - Purpose: Fetch space information by key (available but not currently used in main sync flow)
    - Used when: Called programmatically if needed for validation
-   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Authentication: Basic Auth (user/pass)
 
 ### Authentication
 
-All requests use one of the following authentication methods:
+All requests use Basic Authentication:
 - **Basic Authentication**: `Authorization: Basic {base64(user:pass)}`
-- **Bearer Token**: `Authorization: Bearer {personalAccessToken}`
 
 ### Request Headers
 
@@ -96,19 +97,12 @@ jobs:
 
 ### 2. Set up Confluence Credentials
 
-You can authenticate using either method:
-
-**Option A: Basic Auth (user + API token)**
+**Basic Auth (user + API token)**
 1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Create a new API token (this will be used as your password value)
 3. Add two repository secrets:
    - `CONFLUENCE_USER` (email/username)
    - `CONFLUENCE_PASS` (API token from step 2)
-
-**Option B: Personal Access Token**
-1. Create a Personal Access Token in your Atlassian account
-2. Add a repository secret:
-   - `CONFLUENCE_TOKEN` (your personal access token)
 
 ## Action Inputs
 
@@ -138,21 +132,6 @@ The `file-mappings` input accepts a JSON object with the following structure:
 }
 ```
 
-**Or using Personal Access Token:**
-
-```json
-{
-	"baseUrl": "https://your-company.atlassian.net/wiki",
-	"personalAccessToken": "your-personal-access-token",
-	"pages": [
-		{
-			"pageId": "123456789",
-			"file": "README.md",
-			"title": "Project Documentation"
-		}
-	]
-}
-```
 
 ### Full Configuration Options
 
@@ -185,8 +164,7 @@ The `file-mappings` input accepts a JSON object with the following structure:
 #### Global Settings
 
 - **`baseUrl`** (required): Your Confluence base URL including `/wiki`
-- **`user`** / **`pass`** (optional): Email/username plus API token (Basic Auth). Required if `personalAccessToken` is not provided.
-- **`personalAccessToken`** (optional): Personal Access Token authentication. Required if `user` and `pass` are not provided.
+- **`user`** / **`pass`** (required): Email/username plus API token (Basic Auth)
 - **`prefix`**: Text to prepend to all synchronized pages
 - **`fileRoot`**: Base directory for file paths (default: repository root)
 

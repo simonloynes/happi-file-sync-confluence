@@ -4,7 +4,6 @@ export interface ConfluenceConfig {
 	baseUrl: string;
 	user?: string;
 	pass?: string;
-	personalAccessToken?: string;
 }
 
 export interface ConfluencePage {
@@ -65,8 +64,8 @@ export class ConfluenceApiClient {
 		this.logger = createLogger(debug, "ConfluenceAPI");
 
 		// Validate authentication
-		if (!this.config.personalAccessToken && !(this.config.user && this.config.pass)) {
-			throw new Error("Either personalAccessToken or both user and pass must be provided for authentication");
+		if (!this.config.user || !this.config.pass) {
+			throw new Error("Both user and pass must be provided for authentication");
 		}
 	}
 
@@ -79,12 +78,8 @@ export class ConfluenceApiClient {
 			Accept: "application/json"
 		};
 
-		if (this.config.personalAccessToken) {
-			headers["Authorization"] = `Bearer ${this.config.personalAccessToken}`;
-		} else if (this.config.user && this.config.pass) {
-			const credentials = Buffer.from(`${this.config.user}:${this.config.pass}`).toString("base64");
-			headers["Authorization"] = `Basic ${credentials}`;
-		}
+		const credentials = Buffer.from(`${this.config.user}:${this.config.pass}`).toString("base64");
+		headers["Authorization"] = `Basic ${credentials}`;
 
 		return headers;
 	}

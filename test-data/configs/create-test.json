@@ -2,7 +2,6 @@
 	"baseUrl": "https://your-company.atlassian.net/wiki",
 	"user": "your-email@company.com",
 	"pass": "your-api-token",
-	"personalAccessToken": "",
 	"fileRoot": "./test-data",
 	"pages": [
 		{

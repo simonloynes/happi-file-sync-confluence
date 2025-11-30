@@ -29,7 +29,8 @@ describe("syncFiles", () => {
 		const options: SyncFilesOptions = {
 			fileMap: {
 				baseUrl: "https://fake-test-confluence.invalid/rest/api",
-				personalAccessToken: "fake-token",
+				user: "testuser",
+				pass: "testpass",
 				pages: []
 			},
 			page: {
@@ -105,20 +106,7 @@ describe("syncFiles", () => {
 		assert.equal(options.page.title, undefined, "title should be undefined when not provided");
 	});
 
-	it("should handle different authentication methods in types", () => {
-		// Test with personalAccessToken
-		const tokenOptions: SyncFilesOptions = {
-			fileMap: {
-				baseUrl: "https://fake-test-confluence.invalid/rest/api",
-				personalAccessToken: "fake-token",
-				pages: []
-			},
-			page: {
-				pageId: "123456",
-				file: "test.md"
-			}
-		};
-
+	it("should handle user/pass authentication in types", () => {
 		// Test with user/pass
 		const userPassOptions: SyncFilesOptions = {
 			fileMap: {
@@ -133,7 +121,6 @@ describe("syncFiles", () => {
 			}
 		};
 
-		assert.ok(tokenOptions.fileMap.personalAccessToken, "should support personalAccessToken");
 		assert.ok(userPassOptions.fileMap.user, "should support user");
 		assert.ok(userPassOptions.fileMap.pass, "should support pass");
 	});

@@ -6,7 +6,8 @@ describe("types and schemas", () => {
 	it("should validate correct FileMappingsSchema", () => {
 		const validConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
-			personalAccessToken: "fake-token",
+			user: "testuser",
+			pass: "testpass",
 			prefix: "Auto-generated",
 			fileRoot: "/test",
 			pages: [
@@ -22,7 +23,8 @@ describe("types and schemas", () => {
 
 		assert.ok(result, "valid config should parse successfully");
 		assert.equal(result.baseUrl, validConfig.baseUrl);
-		assert.equal(result.personalAccessToken, validConfig.personalAccessToken);
+		assert.equal(result.user, validConfig.user);
+		assert.equal(result.pass, validConfig.pass);
 		assert.equal(result.pages.length, 1);
 		assert.equal(result.pages[0].pageId, "123456");
 		assert.equal(result.pages[0].file, "README.md");
@@ -32,7 +34,8 @@ describe("types and schemas", () => {
 	it("should apply default values for optional fields", () => {
 		const minimalConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
-			personalAccessToken: "fake-token",
+			user: "testuser",
+			pass: "testpass",
 			pages: [
 				{
 					pageId: "123456",
@@ -50,7 +53,8 @@ describe("types and schemas", () => {
 	it("should reject invalid config missing required fields", () => {
 		const invalidConfig = {
 			// Missing required baseUrl
-			personalAccessToken: "fake-token",
+			user: "testuser",
+			pass: "testpass",
 			pages: []
 		};
 
@@ -66,7 +70,8 @@ describe("types and schemas", () => {
 	it("should reject invalid page config", () => {
 		const invalidConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
-			personalAccessToken: "fake-token",
+			user: "testuser",
+			pass: "testpass",
 			pages: [
 				{
 					// Missing required pageId and file
@@ -102,13 +107,13 @@ describe("types and schemas", () => {
 		assert.ok(result, "user/pass config should parse successfully");
 		assert.equal(result.user, "testuser");
 		assert.equal(result.pass, "testpass");
-		assert.equal(result.personalAccessToken, undefined);
 	});
 
 	it("should handle empty pages array", () => {
 		const emptyPagesConfig = {
 			baseUrl: "https://fake-test-confluence.invalid/rest/api",
-			personalAccessToken: "fake-token",
+			user: "testuser",
+			pass: "testpass",
 			pages: []
 		};
 
