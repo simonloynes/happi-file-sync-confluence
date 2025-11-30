@@ -15,6 +15,51 @@ A GitHub Action that syncs files from your repository to Confluence pages automa
 - 🧪 **Testing Support**: Dry-run mode and local testing capabilities
 - 🛡️ **Error Handling**: Comprehensive validation and error reporting
 
+## HTTP Requests
+
+This script makes the following HTTP requests to your Confluence instance:
+
+**⚠️ Important**: Please review the code in `src/confluence-api.ts` to verify these requests before using this script in your environment.
+
+### Confluence API Requests
+
+All requests are made to: `{baseUrl}/rest/api{endpoint}`
+
+1. **GET `/content/{pageId}?expand=body.storage,version,space`**
+   - Purpose: Fetch an existing page by ID to check if it exists and get its current content/version
+   - Used when: Checking if a page exists before updating it
+   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+
+2. **POST `/content`**
+   - Purpose: Create a new Confluence page
+   - Used when: Creating a new page (when pageId doesn't exist)
+   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Request Body: JSON with page title, space, body content, and optional parent page
+
+3. **PUT `/content/{pageId}`**
+   - Purpose: Update an existing Confluence page
+   - Used when: Updating an existing page (when pageId exists)
+   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+   - Request Body: JSON with page ID, title, body content, and version number
+
+4. **GET `/space/{spaceKey}`**
+   - Purpose: Fetch space information by key (available but not currently used in main sync flow)
+   - Used when: Called programmatically if needed for validation
+   - Authentication: Basic Auth (user/pass) or Bearer token (personalAccessToken)
+
+### Authentication
+
+All requests use one of the following authentication methods:
+- **Basic Authentication**: `Authorization: Basic {base64(user:pass)}`
+- **Bearer Token**: `Authorization: Bearer {personalAccessToken}`
+
+### Request Headers
+
+All requests include:
+- `Content-Type: application/json`
+- `Accept: application/json`
+- `Authorization: {as described above}`
+
 ## Quick Start
 
 ### 1. Basic Usage in GitHub Actions

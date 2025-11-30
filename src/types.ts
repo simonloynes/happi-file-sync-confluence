@@ -30,4 +30,3 @@ export interface SyncFilesOptions {
 }
 
 export type FileMappingType = z.infer<typeof FileMappingsSchema>;
-// export type FileMappingsType = z.infer<typeof FileMappingsSchema>;
